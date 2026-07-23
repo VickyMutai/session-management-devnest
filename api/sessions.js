@@ -30,28 +30,39 @@ const sampleSessions = [
   },
 ];
 
-function json(body, init = {}) {
-  return Response.json(body, {
-    ...init,
-    headers: {
-      "Cache-Control": "no-store",
-      ...init.headers,
-    },
-  });
+function sendJson(res, status, body) {
+  res.setHeader("Cache-Control", "no-store");
+  res.status(status).json(body);
+}
+
+function parseBody(req) {
+  if (!req.body) {
+    return null;
+  }
+
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return null;
+    }
+  }
+
+  return req.body;
 }
 
 function normalizeSession(session) {
   return {
-    id: String(session.id || ""),
-    title: String(session.title || "").trim(),
-    date: String(session.date || ""),
-    time: String(session.time || ""),
-    duration: Number(session.duration || 0),
-    status: String(session.status || "Planned"),
-    speaker: String(session.speaker || "").trim(),
-    room: String(session.room || "").trim(),
-    notes: String(session.notes || "").trim(),
-    updatedAt: session.updatedAt || new Date().toISOString(),
+    id: String(session?.id || ""),
+    title: String(session?.title || "").trim(),
+    date: String(session?.date || ""),
+    time: String(session?.time || ""),
+    duration: Number(session?.duration || 0),
+    status: String(session?.status || "Planned"),
+    speaker: String(session?.speaker || "").trim(),
+    room: String(session?.room || "").trim(),
+    notes: String(session?.notes || "").trim(),
+    updatedAt: session?.updatedAt || new Date().toISOString(),
   };
 }
 
@@ -68,9 +79,9 @@ function sortSessions(items) {
   });
 }
 
-function requireAdmin(request) {
-  const provided = request.headers.get("x-admin-secret");
-  return Boolean(provided && provided === ADMIN_SECRET);
+function requireAdmin(req) {
+  const provided = req.headers["x-admin-secret"];
+  return typeof provided === "string" && provided === ADMIN_SECRET;
 }
 
 async function readSessions() {
@@ -118,33 +129,31 @@ async function writeSessions(nextSessions, etag) {
   return readSessions();
 }
 
-export default async function handler(request) {
+export default async function handler(req, res) {
   try {
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return json(
-        { error: "BLOB_READ_WRITE_TOKEN is missing on this deployment." },
-        { status: 500 },
-      );
+      return sendJson(res, 500, {
+        error: "BLOB_READ_WRITE_TOKEN is missing on this deployment.",
+      });
     }
 
-    if (request.method === "GET") {
+    if (req.method === "GET") {
       const { sessions } = await readSessions();
-      return json({ sessions });
+      return sendJson(res, 200, { sessions });
     }
 
-    if (!requireAdmin(request)) {
-      return json({ error: "Unauthorized" }, { status: 401 });
+    if (!requireAdmin(req)) {
+      return sendJson(res, 401, { error: "Unauthorized" });
     }
 
     const { sessions, etag } = await readSessions();
 
-    if (request.method === "POST") {
-      const incoming = normalizeSession(await request.json());
+    if (req.method === "POST") {
+      const incoming = normalizeSession(parseBody(req));
       if (!incoming.id || !incoming.title || !incoming.date || !incoming.time) {
-        return json(
-          { error: "Title, date, time, and id are required." },
-          { status: 400 },
-        );
+        return sendJson(res, 400, {
+          error: "Title, date, time, and id are required.",
+        });
       }
 
       const nextSessions = sessions.some((session) => session.id === incoming.id)
@@ -154,41 +163,40 @@ export default async function handler(request) {
         : [incoming, ...sessions];
 
       const saved = await writeSessions(nextSessions, etag);
-      return json({ sessions: saved.sessions });
+      return sendJson(res, 200, { sessions: saved.sessions });
     }
 
-    if (request.method === "PUT") {
-      const body = await request.json();
+    if (req.method === "PUT") {
+      const body = parseBody(req);
       const nextSessions = Array.isArray(body?.sessions)
         ? body.sessions.map(normalizeSession)
         : [];
       const saved = await writeSessions(nextSessions, etag);
-      return json({ sessions: saved.sessions });
+      return sendJson(res, 200, { sessions: saved.sessions });
     }
 
-    if (request.method === "DELETE") {
-      const { searchParams } = new URL(request.url);
-      const id = searchParams.get("id");
-
+    if (req.method === "DELETE") {
+      const id = typeof req.query?.id === "string" ? req.query.id : null;
       if (!id) {
-        return json({ error: "Missing session id." }, { status: 400 });
+        return sendJson(res, 400, { error: "Missing session id." });
       }
 
       const nextSessions = sessions.filter((session) => session.id !== id);
       const saved = await writeSessions(nextSessions, etag);
-      return json({ sessions: saved.sessions });
+      return sendJson(res, 200, { sessions: saved.sessions });
     }
 
-    return json({ error: "Method not allowed" }, { status: 405 });
+    return sendJson(res, 405, { error: "Method not allowed" });
   } catch (error) {
     if (error instanceof BlobPreconditionFailedError) {
-      return json(
-        { error: "Another admin updated the schedule. Retry your change." },
-        { status: 409 },
-      );
+      return sendJson(res, 409, {
+        error: "Another admin updated the schedule. Retry your change.",
+      });
     }
 
     console.error(error);
-    return json({ error: "Unable to process session request." }, { status: 500 });
+    return sendJson(res, 500, {
+      error: "Unable to process session request.",
+    });
   }
 }

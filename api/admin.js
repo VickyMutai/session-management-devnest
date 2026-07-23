@@ -1,24 +1,35 @@
 const ADMIN_SECRET = "afrihealth2026";
 
-function json(body, init = {}) {
-  return Response.json(body, {
-    ...init,
-    headers: {
-      "Cache-Control": "no-store",
-      ...init.headers,
-    },
-  });
+function sendJson(res, status, body) {
+  res.setHeader("Cache-Control", "no-store");
+  res.status(status).json(body);
 }
 
-export default async function handler(request) {
-  if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+function parseBody(req) {
+  if (!req.body) {
+    return null;
   }
 
-  const body = await request.json().catch(() => null);
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return null;
+    }
+  }
+
+  return req.body;
+}
+
+export default function handler(req, res) {
+  if (req.method !== "POST") {
+    return sendJson(res, 405, { error: "Method not allowed" });
+  }
+
+  const body = parseBody(req);
   if (body?.secret !== ADMIN_SECRET) {
-    return json({ error: "Invalid admin secret" }, { status: 401 });
+    return sendJson(res, 401, { error: "Invalid admin secret" });
   }
 
-  return json({ ok: true });
+  return sendJson(res, 200, { ok: true });
 }
