@@ -233,6 +233,7 @@ button[type="submit"] {
   margin-bottom: 18px;
 }
 
+.day-toggle,
 .room-toggle {
   display: flex;
   flex-wrap: wrap;
@@ -240,12 +241,14 @@ button[type="submit"] {
   margin-bottom: 18px;
 }
 
+.day-filter,
 .room-filter {
   background: rgba(1, 148, 68, 0.07);
   color: var(--brand-green-deep);
   border: 1px solid rgba(1, 148, 68, 0.12);
 }
 
+.day-filter.active,
 .room-filter.active {
   background: linear-gradient(135deg, var(--brand-green), #1bbd69);
   color: white;
@@ -510,6 +513,14 @@ select:focus {
   color: var(--brand-green-deep);
   text-decoration: none;
   font-weight: 700;
+}
+
+.site-footer {
+  margin-top: 24px;
+  padding: 10px 4px 0;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
 }
 
 @media (max-width: 1040px) {

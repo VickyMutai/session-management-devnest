@@ -13,6 +13,7 @@ const speakerInput = document.getElementById("speaker");
 const roomInput = document.getElementById("room");
 const notesInput = document.getElementById("notes");
 const searchInput = document.getElementById("search");
+const dayFilterButtons = Array.from(document.querySelectorAll("[data-day-filter]"));
 const roomFilterButtons = Array.from(
   document.querySelectorAll("[data-room-filter]"),
 );
@@ -30,42 +31,6 @@ const cancelEditButton = document.getElementById("cancel-edit");
 const syncStatus = document.getElementById("sync-status");
 
 const sampleSessions = [
-  {
-    id: "sample-opening",
-    title: "Opening remarks and welcome",
-    date: "2026-07-23",
-    time: "09:00",
-    duration: 30,
-    status: "In Progress",
-    speaker: "Afrihealth leadership team",
-    room: "Main Hall",
-    notes: "Kickoff session for all participants and invited guests.",
-    updatedAt: "2026-07-23T09:00:00.000Z",
-  },
-  {
-    id: "sample-panel",
-    title: "Innovation challenge panel",
-    date: "2026-07-23",
-    time: "11:00",
-    duration: 60,
-    status: "Planned",
-    speaker: "Guest panelists",
-    room: "Breakout Room A",
-    notes: "Panel discussion on health innovation and implementation.",
-    updatedAt: "2026-07-23T09:15:00.000Z",
-  },
-  {
-    id: "sample-demo",
-    title: "Team demo showcase",
-    date: "2026-07-24",
-    time: "14:00",
-    duration: 90,
-    status: "Planned",
-    speaker: "Selected finalist teams",
-    room: "Main Hall",
-    notes: "Live demos and judging feedback session.",
-    updatedAt: "2026-07-23T09:30:00.000Z",
-  },
 ];
 
 let sessions = [];
@@ -73,6 +38,7 @@ let isAdmin = false;
 let adminSecret = "";
 let editingSessionId = null;
 let isApiAvailable = true;
+let activeDayFilter = "all";
 let activeRoomFilter = "all";
 let lastSyncLabel = "Connecting";
 
@@ -264,6 +230,7 @@ function renderSessions() {
 function render() {
   renderStats();
   renderSessions();
+  renderDayFilters();
   renderRoomFilters();
   updateAdminUI();
 }
@@ -286,6 +253,14 @@ function matchesRoomFilter(session) {
   return true;
 }
 
+function matchesDayFilter(session) {
+  if (activeDayFilter === "all") {
+    return true;
+  }
+
+  return session.date === activeDayFilter;
+}
+
 function getVisibleSessions() {
   const searchTerm = searchInput?.value.trim().toLowerCase() || "";
 
@@ -302,7 +277,11 @@ function getVisibleSessions() {
       .join(" ")
       .toLowerCase();
 
-    return haystack.includes(searchTerm) && matchesRoomFilter(session);
+    return (
+      haystack.includes(searchTerm) &&
+      matchesRoomFilter(session) &&
+      matchesDayFilter(session)
+    );
   });
 }
 
@@ -388,6 +367,14 @@ function renderSessionCard(session, compact = false) {
 function renderRoomFilters() {
   roomFilterButtons.forEach((button) => {
     const isActive = button.dataset.roomFilter === activeRoomFilter;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
+}
+
+function renderDayFilters() {
+  dayFilterButtons.forEach((button) => {
+    const isActive = button.dataset.dayFilter === activeDayFilter;
     button.classList.toggle("active", isActive);
     button.setAttribute("aria-pressed", String(isActive));
   });
@@ -595,6 +582,13 @@ cancelEditButton?.addEventListener("click", () => {
 });
 
 searchInput?.addEventListener("input", render);
+
+dayFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activeDayFilter = button.dataset.dayFilter || "all";
+    render();
+  });
+});
 
 roomFilterButtons.forEach((button) => {
   button.addEventListener("click", () => {

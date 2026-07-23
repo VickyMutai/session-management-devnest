@@ -19,16 +19,6 @@
           src="logo.png"
           alt="Afrihealth Innovation Challenge 2026"
         />
-        <p class="eyebrow">Afrihealth Innovation Challenge 2026</p>
-        <h1>Final program and live session schedule</h1>
-        <p class="subtitle">
-          Follow the full innovation challenge program, view live session
-          details, and keep participants aligned throughout the event.
-        </p>
-        <div class="portal-actions">
-          <a class="btn btn-primary" href="#schedule">View sessions</a>
-          <a class="btn btn-secondary" href="#highlights">Program overview</a>
-        </div>
       </header>
 
       <main class="home-layout">
@@ -47,6 +37,30 @@
               <h2>All sessions</h2>
             </div>
             <input type="search" id="search" placeholder="Search sessions" />
+          </div>
+
+          <div class="day-toggle" role="tablist" aria-label="Day view">
+            <button
+              type="button"
+              class="day-filter active"
+              data-day-filter="all"
+            >
+              All Days
+            </button>
+            <button
+              type="button"
+              class="day-filter"
+              data-day-filter="2026-07-23"
+            >
+              Day 1
+            </button>
+            <button
+              type="button"
+              class="day-filter"
+              data-day-filter="2026-07-24"
+            >
+              Day 2
+            </button>
           </div>
 
           <div class="room-toggle" role="tablist" aria-label="Room view">
@@ -77,6 +91,10 @@
           <div id="session-list" class="session-list"></div>
         </section>
       </main>
+
+      <footer class="site-footer">
+        <p>Powered by DevNest</p>
+      </footer>
     </div>
 
     <script src="app.js"></script>
