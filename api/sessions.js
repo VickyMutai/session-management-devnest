@@ -4,22 +4,28 @@ const SESSIONS_PATH = "portal/sessions.json";
 const MINUTE = 60;
 const sampleSessions = [
   {
-    id: "sample-kickoff",
-    title: "Challenge kickoff",
+    id: "sample-opening",
+    title: "Opening remarks and welcome",
     date: "2026-07-23",
-    duration: 45,
-    status: "Planned",
-    notes: "Launch the Afrihealth Innovation Challenge agenda.",
+    time: "09:00",
+    duration: 30,
+    status: "In Progress",
+    speaker: "Afrihealth leadership team",
+    room: "Main Hall",
+    notes: "Kickoff session for all participants and invited guests.",
     updatedAt: "2026-07-23T09:00:00.000Z",
   },
   {
-    id: "sample-review",
-    title: "Innovation review",
-    date: "2026-07-24",
-    duration: 30,
-    status: "In Progress",
-    notes: "Review standout ideas and implementation plans.",
-    updatedAt: "2026-07-23T10:30:00.000Z",
+    id: "sample-panel",
+    title: "Innovation challenge panel",
+    date: "2026-07-23",
+    time: "11:00",
+    duration: 60,
+    status: "Planned",
+    speaker: "Guest panelists",
+    room: "Breakout Room A",
+    notes: "Panel discussion on health innovation and implementation.",
+    updatedAt: "2026-07-23T09:15:00.000Z",
   },
 ];
 
@@ -38,8 +44,11 @@ function normalizeSession(session) {
     id: String(session.id || ""),
     title: String(session.title || "").trim(),
     date: String(session.date || ""),
+    time: String(session.time || ""),
     duration: Number(session.duration || 0),
     status: String(session.status || "Planned"),
+    speaker: String(session.speaker || "").trim(),
+    room: String(session.room || "").trim(),
     notes: String(session.notes || "").trim(),
     updatedAt: session.updatedAt || new Date().toISOString(),
   };
@@ -47,11 +56,14 @@ function normalizeSession(session) {
 
 function sortSessions(items) {
   return [...items].sort((left, right) => {
-    if (left.date === right.date) {
+    const leftKey = `${left.date || ""}T${left.time || "00:00"}`;
+    const rightKey = `${right.date || ""}T${right.time || "00:00"}`;
+
+    if (leftKey === rightKey) {
       return left.title.localeCompare(right.title);
     }
 
-    return left.date.localeCompare(right.date);
+    return leftKey.localeCompare(rightKey);
   });
 }
 
@@ -128,8 +140,11 @@ export default async function handler(request) {
 
     if (request.method === "POST") {
       const incoming = normalizeSession(await request.json());
-      if (!incoming.id || !incoming.title || !incoming.date) {
-        return json({ error: "Title, date, and id are required." }, { status: 400 });
+      if (!incoming.id || !incoming.title || !incoming.date || !incoming.time) {
+        return json(
+          { error: "Title, date, time, and id are required." },
+          { status: 400 },
+        );
       }
 
       const nextSessions = sessions.some((session) => session.id === incoming.id)
