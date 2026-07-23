@@ -279,11 +279,51 @@ button[type="submit"] {
   gap: 14px;
 }
 
+.session-slot {
+  display: grid;
+  gap: 12px;
+}
+
+.slot-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.slot-time {
+  color: var(--brand-red);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.slot-count {
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.session-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.session-row.is-concurrent {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
 .session-card {
   background: linear-gradient(180deg, #ffffff, #fffaf7);
   border: 1px solid rgba(1, 148, 68, 0.12);
   border-radius: 22px;
   padding: 18px;
+}
+
+.session-card-compact {
+  height: 100%;
 }
 
 .session-top {
@@ -493,7 +533,8 @@ select:focus {
   .actions,
   .admin-form,
   .card-actions,
-  .session-top {
+  .session-top,
+  .slot-header {
     flex-direction: column;
     align-items: stretch;
   }

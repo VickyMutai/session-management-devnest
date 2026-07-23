@@ -253,45 +253,12 @@ function renderSessions() {
     return;
   }
 
-  listContainer.innerHTML = visibleSessions
-    .map((session) => {
-      const statusClass =
-        session.status === "Completed"
-          ? "completed"
-          : session.status === "In Progress"
-            ? "progress"
-            : "planned";
-      const actionsMarkup = isAdmin
-        ? `
-            <div class="card-actions">
-              <button data-action="edit" data-id="${session.id}">Edit</button>
-              <button data-action="toggle" data-id="${session.id}">Toggle status</button>
-              <button class="secondary" data-action="delete" data-id="${session.id}">Delete</button>
-            </div>
-          `
-        : "";
+  if (!adminForm) {
+    listContainer.innerHTML = renderConcurrentSessionGroups(visibleSessions);
+    return;
+  }
 
-      return `
-        <article class="session-card">
-          <div class="session-top">
-            <div>
-              <div class="session-kicker">${formatDate(session.date)}${session.time ? ` • ${formatTime(session.time)}` : ""}</div>
-              <div class="session-title">${escapeHtml(session.title)}</div>
-              <div class="session-meta">${session.duration} min${session.room ? ` • ${escapeHtml(session.room)}` : ""}</div>
-            </div>
-            <div class="badge ${statusClass}">${escapeHtml(session.status)}</div>
-          </div>
-          <div class="session-badges">
-            ${session.speaker ? `<span class="badge badge-speaker">Speaker: ${escapeHtml(session.speaker)}</span>` : ""}
-            ${session.room ? `<span class="badge badge-room">Room: ${escapeHtml(session.room)}</span>` : ""}
-            ${session.updatedAt ? `<span class="badge badge-muted">Updated ${formatDateTime(session.updatedAt)}</span>` : ""}
-          </div>
-          ${session.notes ? `<p class="session-meta session-notes">${escapeHtml(session.notes)}</p>` : ""}
-          ${actionsMarkup}
-        </article>
-      `;
-    })
-    .join("");
+  listContainer.innerHTML = visibleSessions.map(renderSessionCard).join("");
 }
 
 function render() {
@@ -337,6 +304,85 @@ function getVisibleSessions() {
 
     return haystack.includes(searchTerm) && matchesRoomFilter(session);
   });
+}
+
+function renderConcurrentSessionGroups(visibleSessions) {
+  const groups = [];
+
+  visibleSessions.forEach((session) => {
+    const key = `${session.date || ""}__${session.time || ""}`;
+    const lastGroup = groups[groups.length - 1];
+
+    if (lastGroup && lastGroup.key === key) {
+      lastGroup.sessions.push(session);
+      return;
+    }
+
+    groups.push({
+      key,
+      date: session.date,
+      time: session.time,
+      sessions: [session],
+    });
+  });
+
+  return groups
+    .map((group) => {
+      const slotLabel = `${formatDate(group.date)}${group.time ? ` • ${formatTime(group.time)}` : ""}`;
+
+      return `
+        <section class="session-slot">
+          <div class="slot-header">
+            <div class="slot-time">${slotLabel}</div>
+            <div class="slot-count">
+              ${group.sessions.length > 1 ? `${group.sessions.length} concurrent sessions` : "Single session"}
+            </div>
+          </div>
+          <div class="session-row${group.sessions.length > 1 ? " is-concurrent" : ""}">
+            ${group.sessions.map((session) => renderSessionCard(session, true)).join("")}
+          </div>
+        </section>
+      `;
+    })
+    .join("");
+}
+
+function renderSessionCard(session, compact = false) {
+  const statusClass =
+    session.status === "Completed"
+      ? "completed"
+      : session.status === "In Progress"
+        ? "progress"
+        : "planned";
+  const actionsMarkup = isAdmin
+    ? `
+        <div class="card-actions">
+          <button data-action="edit" data-id="${session.id}">Edit</button>
+          <button data-action="toggle" data-id="${session.id}">Toggle status</button>
+          <button class="secondary" data-action="delete" data-id="${session.id}">Delete</button>
+        </div>
+      `
+    : "";
+
+  return `
+    <article class="session-card${compact ? " session-card-compact" : ""}">
+      <div class="session-top">
+        <div>
+          <div class="session-kicker">${formatDate(session.date)}${session.time ? ` • ${formatTime(session.time)}` : ""}</div>
+          <div class="session-title">${escapeHtml(session.title)}</div>
+          <div class="session-meta">${session.duration} min${session.room ? ` • ${escapeHtml(session.room)}` : ""}</div>
+        </div>
+        <div class="badge ${statusClass}">${escapeHtml(session.status)}</div>
+      </div>
+      <div class="session-badges">
+        ${session.speaker ? `<span class="badge badge-speaker">Speaker: ${escapeHtml(session.speaker)}</span>` : ""}
+        ${session.room ? `<span class="badge badge-room">Room: ${escapeHtml(session.room)}</span>` : ""}
+        ${session.updatedAt ? `<span class="badge badge-muted">Updated ${formatDateTime(session.updatedAt)}</span>` : ""}
+      </div>
+      ${session.notes ? `<p class="session-meta session-notes">${escapeHtml(session.notes)}</p>` : ""}
+      ${actionsMarkup}
+    </article>
+  `;
 }
 
 function renderRoomFilters() {
