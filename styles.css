@@ -332,6 +332,14 @@ button[type="submit"] {
   border: 1px solid rgba(1, 148, 68, 0.12);
 }
 
+.day-filter.day-filter-muted {
+  background: rgba(120, 126, 138, 0.12);
+  color: #7d8593;
+  border-color: rgba(120, 126, 138, 0.18);
+  box-shadow: none;
+  opacity: 1;
+}
+
 .day-filter.active,
 .room-filter.active {
   background: linear-gradient(135deg, var(--brand-green), #1bbd69);
