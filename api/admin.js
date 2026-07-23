@@ -1,3 +1,5 @@
+const ADMIN_SECRET = "afrihealth2026";
+
 function json(body, init = {}) {
   return Response.json(body, {
     ...init,
@@ -13,13 +15,8 @@ export default async function handler(request) {
     return json({ error: "Method not allowed" }, { status: 405 });
   }
 
-  const expected = process.env.ADMIN_SECRET;
-  if (!expected) {
-    return json({ error: "ADMIN_SECRET is missing on this deployment." }, { status: 500 });
-  }
-
   const body = await request.json().catch(() => null);
-  if (body?.secret !== expected) {
+  if (body?.secret !== ADMIN_SECRET) {
     return json({ error: "Invalid admin secret" }, { status: 401 });
   }
 

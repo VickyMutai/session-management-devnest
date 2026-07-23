@@ -2,6 +2,7 @@ import { BlobPreconditionFailedError, get, put } from "@vercel/blob";
 
 const SESSIONS_PATH = "portal/sessions.json";
 const MINUTE = 60;
+const ADMIN_SECRET = "afrihealth2026";
 const sampleSessions = [
   {
     id: "sample-opening",
@@ -68,9 +69,8 @@ function sortSessions(items) {
 }
 
 function requireAdmin(request) {
-  const expected = process.env.ADMIN_SECRET;
   const provided = request.headers.get("x-admin-secret");
-  return Boolean(expected && provided && provided === expected);
+  return Boolean(provided && provided === ADMIN_SECRET);
 }
 
 async function readSessions() {
