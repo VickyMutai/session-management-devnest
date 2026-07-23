@@ -13,6 +13,9 @@ const speakerInput = document.getElementById("speaker");
 const roomInput = document.getElementById("room");
 const notesInput = document.getElementById("notes");
 const searchInput = document.getElementById("search");
+const roomFilterButtons = Array.from(
+  document.querySelectorAll("[data-room-filter]"),
+);
 const statsContainer = document.getElementById("stats");
 const listContainer = document.getElementById("session-list");
 const clearAllButton = document.getElementById("clear-all");
@@ -70,6 +73,7 @@ let isAdmin = false;
 let adminSecret = "";
 let editingSessionId = null;
 let isApiAvailable = true;
+let activeRoomFilter = "all";
 let lastSyncLabel = "Connecting";
 
 function generateId() {
@@ -204,14 +208,15 @@ function renderStats() {
     return;
   }
 
-  const total = sessions.length;
-  const completed = sessions.filter(
+  const filteredSessions = getVisibleSessions();
+  const total = filteredSessions.length;
+  const completed = filteredSessions.filter(
     (session) => session.status === "Completed",
   ).length;
-  const planned = sessions.filter(
+  const planned = filteredSessions.filter(
     (session) => session.status === "Planned",
   ).length;
-  const inProgress = sessions.filter(
+  const inProgress = filteredSessions.filter(
     (session) => session.status === "In Progress",
   ).length;
 
@@ -240,21 +245,7 @@ function renderSessions() {
     return;
   }
 
-  const searchTerm = searchInput?.value.trim().toLowerCase() || "";
-  const visibleSessions = sessions.filter((session) => {
-    const haystack = [
-      session.title,
-      session.notes,
-      session.status,
-      session.speaker,
-      session.room,
-      session.date,
-      session.time,
-    ]
-      .join(" ")
-      .toLowerCase();
-    return haystack.includes(searchTerm);
-  });
+  const visibleSessions = getVisibleSessions();
 
   if (!visibleSessions.length) {
     listContainer.innerHTML =
@@ -306,7 +297,54 @@ function renderSessions() {
 function render() {
   renderStats();
   renderSessions();
+  renderRoomFilters();
   updateAdminUI();
+}
+
+function matchesRoomFilter(session) {
+  const room = (session.room || "").trim().toLowerCase();
+
+  if (activeRoomFilter === "all") {
+    return true;
+  }
+
+  if (activeRoomFilter === "main hall") {
+    return room.includes("main hall");
+  }
+
+  if (activeRoomFilter === "breakout") {
+    return room.includes("breakout");
+  }
+
+  return true;
+}
+
+function getVisibleSessions() {
+  const searchTerm = searchInput?.value.trim().toLowerCase() || "";
+
+  return sessions.filter((session) => {
+    const haystack = [
+      session.title,
+      session.notes,
+      session.status,
+      session.speaker,
+      session.room,
+      session.date,
+      session.time,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return haystack.includes(searchTerm) && matchesRoomFilter(session);
+  });
+}
+
+function renderRoomFilters() {
+  roomFilterButtons.forEach((button) => {
+    const isActive = button.dataset.roomFilter === activeRoomFilter;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-pressed", String(isActive));
+  });
 }
 
 function resetForm() {
@@ -511,6 +549,13 @@ cancelEditButton?.addEventListener("click", () => {
 });
 
 searchInput?.addEventListener("input", render);
+
+roomFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    activeRoomFilter = button.dataset.roomFilter || "all";
+    render();
+  });
+});
 
 adminForm?.addEventListener("submit", async (event) => {
   event.preventDefault();

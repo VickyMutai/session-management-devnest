@@ -161,6 +161,30 @@
             <input type="search" id="search" placeholder="Search sessions" />
           </div>
 
+          <div class="room-toggle" role="tablist" aria-label="Room view">
+            <button
+              type="button"
+              class="room-filter active"
+              data-room-filter="all"
+            >
+              All
+            </button>
+            <button
+              type="button"
+              class="room-filter"
+              data-room-filter="main hall"
+            >
+              Main Hall
+            </button>
+            <button
+              type="button"
+              class="room-filter"
+              data-room-filter="breakout"
+            >
+              Breakout Room
+            </button>
+          </div>
+
           <div class="stats" id="stats"></div>
           <div id="session-list" class="session-list"></div>
         </section>

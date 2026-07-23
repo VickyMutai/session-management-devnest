@@ -233,6 +233,25 @@ button[type="submit"] {
   margin-bottom: 18px;
 }
 
+.room-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.room-filter {
+  background: rgba(1, 148, 68, 0.07);
+  color: var(--brand-green-deep);
+  border: 1px solid rgba(1, 148, 68, 0.12);
+}
+
+.room-filter.active {
+  background: linear-gradient(135deg, var(--brand-green), #1bbd69);
+  color: white;
+  box-shadow: 0 12px 20px rgba(1, 148, 68, 0.16);
+}
+
 .stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
