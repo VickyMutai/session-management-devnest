@@ -3,32 +3,8 @@ import { BlobPreconditionFailedError, get, put } from "@vercel/blob";
 const SESSIONS_PATH = "portal/sessions.json";
 const MINUTE = 60;
 const ADMIN_SECRET = "afrihealth2026";
-const sampleSessions = [
-  {
-    id: "sample-opening",
-    title: "Opening remarks and welcome",
-    date: "2026-07-23",
-    time: "09:00",
-    duration: 30,
-    status: "In Progress",
-    speaker: "Afrihealth leadership team",
-    room: "Main Hall",
-    notes: "Kickoff session for all participants and invited guests.",
-    updatedAt: "2026-07-23T09:00:00.000Z",
-  },
-  {
-    id: "sample-panel",
-    title: "Innovation challenge panel",
-    date: "2026-07-23",
-    time: "11:00",
-    duration: 60,
-    status: "Planned",
-    speaker: "Guest panelists",
-    room: "Breakout Room A",
-    notes: "Panel discussion on health innovation and implementation.",
-    updatedAt: "2026-07-23T09:15:00.000Z",
-  },
-];
+const BLOB_ACCESS = "public";
+const sampleSessions = [];
 
 function sendJson(res, status, body) {
   res.setHeader("Cache-Control", "no-store");
@@ -86,7 +62,7 @@ function requireAdmin(req) {
 
 async function readSessions() {
   const result = await get(SESSIONS_PATH, {
-    access: "private",
+    access: BLOB_ACCESS,
   });
 
   if (!result) {
@@ -119,7 +95,7 @@ async function writeSessions(nextSessions, etag) {
   );
 
   await put(SESSIONS_PATH, payload, {
-    access: "private",
+    access: BLOB_ACCESS,
     allowOverwrite: true,
     contentType: "application/json",
     cacheControlMaxAge: MINUTE,
@@ -156,7 +132,9 @@ export default async function handler(req, res) {
         });
       }
 
-      const nextSessions = sessions.some((session) => session.id === incoming.id)
+      const nextSessions = sessions.some(
+        (session) => session.id === incoming.id,
+      )
         ? sessions.map((session) =>
             session.id === incoming.id ? { ...session, ...incoming } : session,
           )
