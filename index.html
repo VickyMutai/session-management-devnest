@@ -13,46 +13,175 @@
   <body>
     <div class="portal-shell">
       <header class="portal-hero">
-        <p class="eyebrow">Afrihealth Innovation Challenge</p>
-        <h1>Welcome to the challenge portal</h1>
+        <p class="eyebrow">Afrihealth Innovation Challenge 2026</p>
+        <h1>Final program and live session schedule</h1>
         <p class="subtitle">
-          Share progress, review key sessions, and explore the innovation
-          dashboard built for this initiative.
+          Follow the full innovation challenge program, view live session
+          details, and keep participants aligned throughout the event.
         </p>
         <div class="portal-actions">
-          <a class="btn btn-primary" href="app.html"
-            >Open challenge dashboard</a
-          >
-          <a class="btn btn-secondary" href="#highlights"
-            >View portal highlights</a
-          >
+          <a class="btn btn-primary" href="#schedule">View sessions</a>
+          <a class="btn btn-secondary" href="#admin">Admin updates</a>
         </div>
       </header>
 
-      <main class="portal-grid" id="highlights">
-        <section class="portal-card">
+      <main class="home-layout">
+        <section class="portal-card portal-intro" id="highlights">
           <h2>What visitors can do</h2>
           <ul class="portal-list">
-            <li>Review challenge sessions and their status.</li>
-            <li>Search and track upcoming activities.</li>
-            <li>Explore a simple public-facing view of the project.</li>
+            <li>See all sessions directly from the home page.</li>
+            <li>Check time, speaker, breakout room, and session status.</li>
+            <li>Search the live program as the admin updates it.</li>
           </ul>
-        </section>
-
-        <section class="portal-card">
           <h2>Why this portal matters</h2>
           <p>
-            The Afrihealth Innovation Challenge needs a clear, welcoming entry
-            point for users to understand the work and move into the live
-            dashboard with ease.
+            The Afrihealth Innovation Challenge needs one clear public page for
+            participants to follow the final program without switching between
+            separate views.
           </p>
           <div class="pill-row">
-            <span class="pill">Challenge planning</span>
-            <span class="pill">Session tracking</span>
-            <span class="pill">Public access</span>
+            <span class="pill">Live schedule</span>
+            <span class="pill">Speaker lineup</span>
+            <span class="pill">Breakout rooms</span>
           </div>
+        </section>
+
+        <section class="panel list-panel home-schedule" id="schedule">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Public Program</p>
+              <h2>All sessions</h2>
+            </div>
+            <input type="search" id="search" placeholder="Search sessions" />
+          </div>
+
+          <div class="stats" id="stats"></div>
+          <div id="session-list" class="session-list"></div>
+        </section>
+
+        <section class="panel form-panel home-admin" id="admin">
+          <div class="admin-panel">
+            <h3>Admin access</h3>
+            <p class="admin-hint">
+              Only approved admins can change shared session details.
+            </p>
+            <form id="admin-form" class="admin-form">
+              <input
+                type="password"
+                id="admin-code"
+                name="admin-code"
+                placeholder="Enter admin secret"
+              />
+              <div class="actions">
+                <button type="submit" class="btn btn-primary">
+                  Access admin
+                </button>
+                <button
+                  type="button"
+                  id="admin-logout"
+                  class="btn btn-secondary"
+                >
+                  Logout
+                </button>
+              </div>
+            </form>
+            <p id="admin-status" class="status-pill">Admin access required</p>
+            <p id="sync-status" class="admin-hint">Connecting</p>
+          </div>
+
+          <h2 id="form-heading">Create a session</h2>
+          <p id="editor-note" class="editor-note">
+            Admin access is required to add or change session details.
+          </p>
+          <form id="session-form" class="session-form">
+            <label>
+              Title
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="Panel discussion"
+                required
+              />
+            </label>
+            <div class="form-grid">
+              <label>
+                Date
+                <input type="date" id="date" name="date" required />
+              </label>
+              <label>
+                Time
+                <input type="time" id="time" name="time" required />
+              </label>
+            </div>
+            <div class="form-grid">
+              <label>
+                Duration (min)
+                <input
+                  type="number"
+                  id="duration"
+                  name="duration"
+                  min="5"
+                  max="480"
+                  value="30"
+                  required
+                />
+              </label>
+              <label>
+                Status
+                <select id="status" name="status">
+                  <option value="Planned">Planned</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Completed">Completed</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Speaker
+              <input
+                type="text"
+                id="speaker"
+                name="speaker"
+                placeholder="Lead facilitator or panel host"
+              />
+            </label>
+            <label>
+              Breakout room
+              <input
+                type="text"
+                id="room"
+                name="room"
+                placeholder="Main hall or breakout room"
+              />
+            </label>
+            <label>
+              Notes
+              <textarea
+                id="notes"
+                name="notes"
+                rows="4"
+                placeholder="Add update notes or priorities"
+              ></textarea>
+            </label>
+            <div class="actions">
+              <button type="submit" id="form-action">Save session</button>
+              <button
+                type="button"
+                id="cancel-edit"
+                class="secondary"
+                hidden
+              >
+                Cancel edit
+              </button>
+              <button type="button" id="clear-all" class="secondary">
+                Clear all
+              </button>
+            </div>
+          </form>
         </section>
       </main>
     </div>
+
+    <script src="app.js"></script>
   </body>
 </html>
