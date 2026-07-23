@@ -188,7 +188,7 @@ async function readSessions() {
   };
 }
 
-async function writeSessions(nextSessions, etag) {
+async function writeSessions(nextSessions) {
   const payload = JSON.stringify(
     {
       sessions: sortSessions(nextSessions).map((session) =>
@@ -204,7 +204,6 @@ async function writeSessions(nextSessions, etag) {
     allowOverwrite: true,
     contentType: "application/json",
     cacheControlMaxAge: MINUTE,
-    ifMatch: etag ?? undefined,
   });
 
   return readSessions();
@@ -227,7 +226,7 @@ export default async function handler(req, res) {
       return sendJson(res, 401, { error: "Unauthorized" });
     }
 
-    const { sessions, etag } = await readSessions();
+    const { sessions } = await readSessions();
 
     if (req.method === "POST") {
       const incoming = normalizeSession(parseBody(req));
@@ -245,7 +244,7 @@ export default async function handler(req, res) {
           )
         : [incoming, ...sessions];
 
-      const saved = await writeSessions(nextSessions, etag);
+      const saved = await writeSessions(nextSessions);
       return sendJson(res, 200, { sessions: saved.sessions });
     }
 
@@ -254,7 +253,7 @@ export default async function handler(req, res) {
       const nextSessions = Array.isArray(body?.sessions)
         ? body.sessions.map(normalizeSession)
         : [];
-      const saved = await writeSessions(nextSessions, etag);
+      const saved = await writeSessions(nextSessions);
       return sendJson(res, 200, { sessions: saved.sessions });
     }
 
@@ -265,7 +264,7 @@ export default async function handler(req, res) {
       }
 
       const nextSessions = sessions.filter((session) => session.id !== id);
-      const saved = await writeSessions(nextSessions, etag);
+      const saved = await writeSessions(nextSessions);
       return sendJson(res, 200, { sessions: saved.sessions });
     }
 
