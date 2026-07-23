@@ -29,14 +29,14 @@
           <div class="admin-panel">
             <h3>Admin access</h3>
             <p class="admin-hint">
-              Only approved admins can change event details.
+              Only approved admins can change shared session details.
             </p>
             <form id="admin-form" class="admin-form">
               <input
                 type="password"
                 id="admin-code"
                 name="admin-code"
-                placeholder="Enter admin code"
+                placeholder="Enter admin secret"
               />
               <div class="actions">
                 <button type="submit" class="btn btn-primary">
@@ -52,11 +52,12 @@
               </div>
             </form>
             <p id="admin-status" class="status-pill">Admin access required</p>
+            <p id="sync-status" class="admin-hint">Connecting</p>
           </div>
 
-          <h2>Create a session</h2>
+          <h2 id="form-heading">Create a session</h2>
           <p id="editor-note" class="editor-note">
-            Admin access is required to add or change event details.
+            Admin access is required to add or change session details.
           </p>
           <form id="session-form" class="session-form">
             <label>
@@ -103,7 +104,15 @@
               ></textarea>
             </label>
             <div class="actions">
-              <button type="submit">Save session</button>
+              <button type="submit" id="form-action">Save session</button>
+              <button
+                type="button"
+                id="cancel-edit"
+                class="secondary"
+                hidden
+              >
+                Cancel edit
+              </button>
               <button type="button" id="clear-all" class="secondary">
                 Clear all
               </button>
