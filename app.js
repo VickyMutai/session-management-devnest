@@ -278,7 +278,7 @@ function renderSessions() {
               <button class="secondary" data-action="delete" data-id="${session.id}">Delete</button>
             </div>
           `
-        : '<p class="read-only-note">View only. Admin changes appear here automatically.</p>';
+        : "";
 
       return `
         <article class="session-card">
@@ -572,8 +572,7 @@ listContainer?.addEventListener("click", async (event) => {
   }
 
   if (action === "toggle") {
-    const nextStatus =
-      session.status === "Completed" ? "Planned" : "Completed";
+    const nextStatus = session.status === "Completed" ? "Planned" : "Completed";
 
     try {
       const payload = await sendSessionRequest("POST", {
