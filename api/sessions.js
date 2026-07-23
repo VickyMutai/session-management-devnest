@@ -4,7 +4,112 @@ const SESSIONS_PATH = "portal/sessions.json";
 const MINUTE = 60;
 const ADMIN_SECRET = "afrihealth2026";
 const BLOB_ACCESS = "public";
-const sampleSessions = [];
+const sampleSessions = [
+  {
+    id: "day1-arrival-registration",
+    title: "Arrival and Registrations",
+    date: "2026-07-23",
+    time: "08:00",
+    duration: 60,
+    status: "Planned",
+    speaker: "",
+    room: "Main Hall",
+    notes: "",
+  },
+  {
+    id: "day1-opening-ceremony",
+    title: "Opening Ceremony",
+    date: "2026-07-23",
+    time: "09:00",
+    duration: 30,
+    status: "Planned",
+    speaker: "Allan Rop (The Cube)",
+    room: "Main Hall",
+    notes:
+      "Keynote Address: The Future of Innovation, Entrepreneurship, and Digital Transformation in Africa. Other participants: KNCCI Chairman and Directors; Willy Kenei.",
+  },
+  {
+    id: "day1-africa-health-collaboration",
+    title: "Africa Health Collaboration",
+    date: "2026-07-23",
+    time: "09:30",
+    duration: 45,
+    status: "Planned",
+    speaker: "Prof. Patrick Kere / Prof. Charles Lagat",
+    room: "Main Hall",
+    notes: "What is AHC? What they are trying to do in the health sector.",
+  },
+  {
+    id: "day1-tea-break-morning",
+    title: "Tea Break",
+    date: "2026-07-23",
+    time: "10:15",
+    duration: 15,
+    status: "Planned",
+    speaker: "",
+    room: "Main Hall",
+    notes: "",
+  },
+  {
+    id: "day1-beyond-funding",
+    title: "Beyond Funding: Understanding Risk in Startup",
+    date: "2026-07-23",
+    time: "10:15",
+    duration: 45,
+    status: "Planned",
+    speaker: "James Kamau (AAR Insurance)",
+    room: "Main Hall",
+    notes: "",
+  },
+  {
+    id: "day1-digital-innovation-commercialization",
+    title:
+      "Digital Innovation, Commercialization, Partnerships, and Scaling Health Enterprises",
+    date: "2026-07-23",
+    time: "11:15",
+    duration: 45,
+    status: "Planned",
+    speaker: "Moderator: Kalaka Simbili (Niko Eldy)",
+    room: "Main Hall",
+    notes:
+      "Panelists: Dr. Joel and Dr. Akama, Moi University; Kenneth Kibet, Konza Technopolis; CPA Anthony Kiplimo, KNCCI; Waziri Kemei and Titus Mengich, Uasin Gishu County.",
+  },
+  {
+    id: "day1-building-future-ready-enterprises",
+    title: "Building Future-Ready Enterprises",
+    date: "2026-07-23",
+    time: "11:15",
+    duration: 45,
+    status: "Planned",
+    speaker: "Emmanuel Cheisro (Digitax)",
+    room: "Breakout Room 1",
+    notes:
+      "Tax Compliance Made Simple: Building Sustainable and Compliant Businesses.",
+  },
+  {
+    id: "day1-health-track-1-pitches",
+    title: "Health Track 1 Pitches",
+    date: "2026-07-23",
+    time: "12:00",
+    duration: 60,
+    status: "Planned",
+    speaker: "Moi University / Africa Health Collaborative",
+    room: "Main Hall",
+    notes:
+      "Pitches from the Moi University and Africa Health Collaborative project.",
+  },
+  {
+    id: "day1-lunch",
+    title: "Lunch",
+    date: "2026-07-23",
+    time: "13:00",
+    duration: 60,
+    status: "Planned",
+    speaker: "",
+    room: "Main Hall",
+    notes: "",
+  },
+];
 
 function sendJson(res, status, body) {
   res.setHeader("Cache-Control", "no-store");
