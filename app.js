@@ -38,7 +38,7 @@ let isAdmin = false;
 let adminSecret = "";
 let editingSessionId = null;
 let isApiAvailable = true;
-let activeDayFilter = "all";
+let activeDayFilter = document.body?.dataset.defaultDayFilter || "all";
 let activeRoomFilter = "all";
 let lastSyncLabel = "Connecting";
 
